@@ -117,13 +117,7 @@ describe("resourceTiming", () => {
             secureConnectionStart: 0,
         } as any as PerformanceEntry;
 
-<<<<<<< HEAD
         window.performance.getEntriesByName = vi.fn().mockReturnValue([exampleResourceTiming]);
-=======
-        window.performance.getEntriesByName = jest
-            .fn()
-            .mockReturnValue([exampleResourceTiming]);
->>>>>>> Not sure why these are failing
 
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
@@ -146,7 +140,6 @@ describe("resourceTiming", () => {
         const sampleMarks = [100, 350];
         const marks = {};
         const measures = {};
-<<<<<<< HEAD
         window.performance.getEntriesByName = vi.fn().mockImplementation((name) => { return measures[name] || []; });
         vi.spyOn(perf, 'mark').mockImplementation((name) => {
             marks[name] = sampleMarks.shift();
@@ -159,28 +152,6 @@ describe("resourceTiming", () => {
                 entryType: 'measure',
                 name,
                 startTime: marks[start]
-=======
-        window.performance.getEntriesByName = jest
-            .fn()
-            .mockImplementation((name) => {
-                return measures[name] || [];
-            });
-        jest.spyOn(perf, "mark").mockImplementation((name) => {
-            marks[name] = sampleMarks.shift();
-            return null;
-        });
-        window.performance.measure = jest
-            .fn()
-            .mockImplementation((name, start, end) => {
-                measures[name] = measures[name] || [];
-                measures[name].push({
-                    duration: marks[end] - marks[start],
-                    entryType: "measure",
-                    name,
-                    startTime: marks[start],
-                });
-                return null;
->>>>>>> Not sure why these are failing
             });
         jest.spyOn(perf, "clearMarks").mockImplementation(() => {
             return null;
@@ -188,11 +159,8 @@ describe("resourceTiming", () => {
         jest.spyOn(perf, "clearMeasures").mockImplementation(() => {
             return null;
         });
-<<<<<<< HEAD
         vi.spyOn(perf, 'clearMarks').mockImplementation(() => { return null; });
         vi.spyOn(perf, 'clearMeasures').mockImplementation(() => { return null; });
-=======
->>>>>>> Not sure why these are failing
 
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
@@ -584,7 +552,6 @@ describe("getData", () => {
         const nonClusteredData =
             (await worker.getData()) as GeoJSON.FeatureCollection;
 
-        console.log("nonClusteredData", nonClusteredData.features[0]);
 
         expect(nonClusteredData.features[0].id).toBe("point1");
         expect(nonClusteredData.features[1].id).toBe("point2");
