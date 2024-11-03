@@ -7,7 +7,11 @@
 - _...Add new stuff here..._
 =======
 - When clustering circles and the promoteId is set to some parameter, the promoted id is used on non-clustered features and the cluster_id is used on clustered features. Previously the id was undefined for non-clustered features.
+<<<<<<< HEAD
 >>>>>>> updated changelog
+=======
+- _...Add new stuff here..._
+>>>>>>> Probably should keep this
 
 ### 🐞 Bug fixes
 
