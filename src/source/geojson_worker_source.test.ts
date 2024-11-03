@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import {describe, beforeEach, afterEach, test, expect, vi} from 'vitest';
-import {GeoJSONWorkerSource, type LoadGeoJSONParameters} from './geojson_worker_source';
-import {StyleLayerIndex} from '../style/style_layer_index';
-import {OverscaledTileID} from './tile_id';
-import perf from '../util/performance';
-import {type LayerSpecification} from '@maplibre/maplibre-gl-style-spec';
-import {type Actor} from '../util/actor';
-import {type WorkerTileParameters} from './worker_source';
-=======
 import {GeoJSONWorkerSource, LoadGeoJSONParameters} from './geojson_worker_source';
 import {StyleLayerIndex} from '../style/style_layer_index';
 import {OverscaledTileID} from './tile_id';
@@ -15,7 +5,6 @@ import perf from '../util/performance';
 import {LayerSpecification} from '@maplibre/maplibre-gl-style-spec';
 import {Actor} from '../util/actor';
 import {WorkerTileParameters} from './worker_source';
->>>>>>> Reverting back to before I accidentally changed the default linter
 import {setPerformance, sleep} from '../util/test/util';
 import {type FakeServer, fakeServer} from 'nise';
 
@@ -36,11 +25,7 @@ describe('reloadTile', () => {
         ] as LayerSpecification[];
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
-<<<<<<< HEAD
-        const spy = vi.spyOn(source, 'loadVectorTile');
-=======
         const spy = jest.spyOn(source, 'loadVectorTile');
->>>>>>> Reverting back to before I accidentally changed the default linter
         const geoJson = {
             'type': 'Feature',
             'geometry': {
@@ -121,11 +106,7 @@ describe('resourceTiming', () => {
             secureConnectionStart: 0
         } as any as PerformanceEntry;
 
-<<<<<<< HEAD
-        window.performance.getEntriesByName = vi.fn().mockReturnValue([exampleResourceTiming]);
-=======
         window.performance.getEntriesByName = jest.fn().mockReturnValue([exampleResourceTiming]);
->>>>>>> Reverting back to before I accidentally changed the default linter
 
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
@@ -140,21 +121,12 @@ describe('resourceTiming', () => {
         const sampleMarks = [100, 350];
         const marks = {};
         const measures = {};
-<<<<<<< HEAD
-        window.performance.getEntriesByName = vi.fn().mockImplementation((name) => { return measures[name] || []; });
-        vi.spyOn(perf, 'mark').mockImplementation((name) => {
-            marks[name] = sampleMarks.shift();
-            return null;
-        });
-        window.performance.measure = vi.fn().mockImplementation((name, start, end) => {
-=======
         window.performance.getEntriesByName = jest.fn().mockImplementation((name) => { return measures[name] || []; });
         jest.spyOn(perf, 'mark').mockImplementation((name) => {
             marks[name] = sampleMarks.shift();
             return null;
         });
         window.performance.measure = jest.fn().mockImplementation((name, start, end) => {
->>>>>>> Reverting back to before I accidentally changed the default linter
             measures[name] = measures[name] || [];
             measures[name].push({
                 duration: marks[end] - marks[start],
@@ -164,13 +136,8 @@ describe('resourceTiming', () => {
             });
             return null;
         });
-<<<<<<< HEAD
-        vi.spyOn(perf, 'clearMarks').mockImplementation(() => { return null; });
-        vi.spyOn(perf, 'clearMeasures').mockImplementation(() => { return null; });
-=======
         jest.spyOn(perf, 'clearMarks').mockImplementation(() => { return null; });
         jest.spyOn(perf, 'clearMeasures').mockImplementation(() => { return null; });
->>>>>>> Reverting back to before I accidentally changed the default linter
 
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
