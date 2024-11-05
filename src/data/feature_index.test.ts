@@ -1,7 +1,6 @@
 import {FeatureIndex} from './feature_index';
 import {OverscaledTileID} from '../source/tile_id';
 import type {VectorTileFeature} from '@mapbox/vector-tile';
-import {log} from 'console';
 
 describe('FeatureIndex', () => {
     describe('getId', () => {
@@ -29,12 +28,9 @@ describe('FeatureIndex', () => {
             expect(featureIndex.getId(feature, 'sourceLayer')).toBe(123); // cluster_id converted to number
         });
     });
-<<<<<<< HEAD
 });geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
                 },
                  as VectorTileFeature
-=======
 });
->>>>>>> These three tests are passing
