@@ -30,6 +30,13 @@ const config: RollupOptions[] = [{
         minifyInternalExports: production
     },
     onwarn: (message) => {
+        // This is a special case for circular dependencies that involve d3.
+        // We ignore these warnings because they are taken care of with Node at compile time and
+        // the author of d3 will never remove circular dependencies from their codebase.
+        if (message.code === 'CIRCULAR_DEPENDENCY' && message.message.includes('d3-')) {
+            return;
+        }
+
         console.error(message);
         throw message;
     },
