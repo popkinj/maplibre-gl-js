@@ -2,9 +2,12 @@ import type {Map} from '../ui/map';
 import {scaleLinear} from 'd3-scale';
 
 export const calculateFeatureState = (map: Map, feature: any, state: any): any => {
+        // Get the layers tied to the same feature source
         const layers = map.getStyle()?.layers.filter(layer => 
             'source' in layer && layer.source === feature.source
         );
+
+        // TODO: This is where we need to add the logic to transform the feature state
 
         console.log('layers', layers);
         console.log('feature', feature);
