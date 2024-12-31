@@ -45,18 +45,7 @@ export const calculateFeatureState = (map: MapLibreMap, feature: any, state: any
             });
         });
 
-        console.log('transitions', transitions);
-
-        console.log('layers', layers);
-        console.log('feature', feature);
-        console.log('feature.id', feature.id);
-        console.log('state', state);
-
-        const radiusScale = scaleLinear()
-            .domain([1, 10]) // 50 values
-            .range([10, 20]) // Output range between 10-20
-
-        const featureState = (state.hover) ? {circleRadius: 20} : {};
-
-    return featureState;
+    return (state.hover && transitions.size > 0) ?
+        {transitioning: true, transitions: transitions} :
+        {};
 }
