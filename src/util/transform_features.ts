@@ -42,6 +42,7 @@ export const activateFeatureTransitions = (
         console.log("transitions", transitions);
 
         // Update the feature state with new transition values
+        // XXX: This causing an infinite loop
         map.setFeatureState(feature, {
             ...featureState,
             transitioning: isStillTransitioning
