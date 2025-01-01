@@ -29,7 +29,7 @@ import {Terrain} from '../render/terrain';
 import {RenderToTexture} from '../render/render_to_texture';
 import {config} from '../util/config';
 import {defaultLocale} from './default_locale';
-import {calculateFeatureState} from '../util/transform_features';
+import {calculateFeatureTransitions, activateFeatureTransitions} from '../util/transform_features';
 
 import type {RequestTransformFunction} from '../util/request_manager';
 import type {LngLatLike} from '../geo/lng_lat';
@@ -2876,9 +2876,17 @@ export class Map extends Camera {
      * @see [Create a hover effect](https://maplibre.org/maplibre-gl-js/docs/examples/hover-styles/)
      */
     setFeatureState(feature: FeatureIdentifier, state: any): this {
-        const featureState = calculateFeatureState(this, feature, state);
+        // Trying to keep the new state logic separate for now
+        const featureState = calculateFeatureTransitions(this, feature, state);
 
+        // Apply the new state to the feature, merging the new state with the existing state
         this.style.setFeatureState(feature, {...state, ...featureState});
+
+        // Kick off all transitions if there are any
+        if (featureState.transitioning) {
+            activateFeatureTransitions(this, feature);
+        }
+
         return this._update();
     }
 
