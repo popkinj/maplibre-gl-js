@@ -2867,9 +2867,10 @@ export class Map extends Camera {
         this.style.setFeatureState(feature, {...state, ...featureState});
 
         // Kick off all transitions if there are any
-        if (featureState.transitioning) {
-            activateFeatureTransitions(this, feature);
-        }
+        // XXX: This causing an infinite loop
+        // if (featureState.transitioning) {
+        //     activateFeatureTransitions(this, feature);
+        // }
 
         return this._update();
     }
