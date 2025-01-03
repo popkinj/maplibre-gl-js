@@ -1,7 +1,7 @@
 import type { Map as MapLibreMap } from "../ui/map";
 import { scaleLinear } from "d3-scale";
 
-export const activateFeatureTransitions = (
+export const updateFeatureTransitions = (
     map: MapLibreMap,
     feature: any,
 ): any => {
@@ -10,59 +10,59 @@ export const activateFeatureTransitions = (
     // If there's no feature state, nothing to transition
     if (!featureState) return;
 
-    const updateTransitionState = () => {
-        let isStillTransitioning = false;
+    console.log("featureState", featureState);
+    console.log("feature", feature);
 
-        // Get current feature state transitions
-        const transitions = featureState.transitions;
-        if (!transitions) return;
+    // TODO: This is where we recalculate the transitions
 
-        // Update each transition value
-        transitions.forEach((transition, key) => {
-            const {start, end, scale} = transition;
+    // const updateTransitionState = () => {
+    //     let isStillTransitioning = false;
 
-            // Calculate progress through transition (0-1)
-            const progress = Math.min((Date.now() - start) / (end - start), 1);
+    //     // Get current feature state transitions
+    //     const transitions = featureState.transitions;
+    //     if (!transitions) return;
+
+    //     // Update each transition value
+    //     transitions.forEach((transition, key) => {
+    //         const {start, end, scale} = transition;
+
+    //         // Calculate progress through transition (0-1)
+    //         const progress = Math.min((Date.now() - start) / (end - start), 1);
             
-            // Get interpolated value
-            const current = scale(progress);
+    //         // Get interpolated value
+    //         const current = scale(progress);
             
-            // Update the transition's current value
-            transitions.set(key, {
-                ...transition,
-                current
-            });
+    //         // Update the transition's current value
+    //         transitions.set(key, {
+    //             ...transition,
+    //             current
+    //         });
 
-            // Check if this transition is still running
-            if (progress < 1) {
-                isStillTransitioning = true;
-            }
-        });
+    //         // Check if this transition is still running
+    //         if (progress < 1) {
+    //             isStillTransitioning = true;
+    //         }
+    //     });
 
-        console.log("transitions", transitions);
+    //     console.log("transitions", transitions);
 
-        // Update the feature state with new transition values
-        // XXX: This causing an infinite loop
-        map.setFeatureState(feature, {
-            ...featureState,
-            transitioning: isStillTransitioning
-        });
+    //     // Update the feature state with new transition values
+    //     // XXX: This causing an infinite loop
+    //     map.setFeatureState(feature, {
+    //         ...featureState,
+    //         transitioning: isStillTransitioning
+    //     });
 
         // Request next frame if still transitioning
         // if (isStillTransitioning) {
         //     requestAnimationFrame(updateTransitionState);
         // }
-    };
-
-    updateTransitionState();
-
-    // Kick off transition updates
-    // requestAnimationFrame(updateTransitionState);
 };
 
+
 export type FeatureTransitions = {
-    transitioning: boolean;
-    transitions: Map<string, any>;
+    transitioning: boolean; // Master flag for whether any transitions are happening
+    transitions: Map<string, any>; // Map of transitions
 };
 
 export type calculateFeatureTransitions = (
@@ -71,6 +71,13 @@ export type calculateFeatureTransitions = (
     state: any
 ) => FeatureTransitions;
 
+/**
+ * Calculate the feature transitions for a given feature and state
+ * @param map - The map instance
+ * @param feature - The feature to calculate transitions for
+ * @param state - The state of the feature
+ * @returns The feature transitions
+ */
 export const calculateFeatureTransitions: calculateFeatureTransitions = (
     map: MapLibreMap,
     feature: any,
@@ -92,9 +99,11 @@ export const calculateFeatureTransitions: calculateFeatureTransitions = (
             after: number;
             current: number;
             scale: any;
+            transitioning: boolean;
         }
     >();
 
+    let isTransitioning = false;
     layers?.forEach((layer) => {
         if (!layer.paint) return;
 
@@ -121,6 +130,8 @@ export const calculateFeatureTransitions: calculateFeatureTransitions = (
                         const beforeValue = paintProperty[3];
                         const afterValue = paintProperty[2];
 
+
+
                         const now = Date.now();
                         transitions.set(`${layer.id}-${key}`, {
                             start: now,
@@ -131,14 +142,18 @@ export const calculateFeatureTransitions: calculateFeatureTransitions = (
                             scale: scaleLinear()
                                 .domain([now, now + transitionValue.duration])
                                 .range([beforeValue, afterValue]),
+                            transitioning: true,
                         });
+                        isTransitioning = true;
                     }
                 }
             }
         });
     });
 
+    
+
     return state.hover && transitions.size > 0
-        ? { transitioning: false, transitions: transitions }
+        ? { transitioning: true, transitions: transitions }
         : {};
 };

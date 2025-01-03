@@ -29,7 +29,7 @@ import {Terrain} from '../render/terrain';
 import {RenderToTexture} from '../render/render_to_texture';
 import {config} from '../util/config';
 import {defaultLocale} from './default_locale';
-import {calculateFeatureTransitions, activateFeatureTransitions} from '../util/transform_features';
+import {calculateFeatureTransitions, updateFeatureTransitions} from '../util/transform_features';
 
 import type {RequestTransformFunction} from '../util/request_manager';
 import type {LngLatLike} from '../geo/lng_lat';
@@ -2883,10 +2883,9 @@ export class Map extends Camera {
         this.style.setFeatureState(feature, {...state, ...featureState});
 
         // Kick off all transitions if there are any
-        // XXX: This causing an infinite loop
-        // if (featureState.transitioning) {
-        //     activateFeatureTransitions(this, feature);
-        // }
+        if (featureState.transitioning) {
+            updateFeatureTransitions(this, feature);
+        }
 
         return this._update();
     }
