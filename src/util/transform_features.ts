@@ -10,53 +10,17 @@ export const updateFeatureTransitions = (
     // If there's no feature state, nothing to transition
     if (!featureState) return;
 
-    console.log("featureState", featureState);
-    console.log("feature", feature);
+    // Get the start and end times for the transition
+    const [start, end] = featureState.transitions.get("unclustered-point-circle-radius-transition").scale.domain();
+    console.log("start", start);
+    console.log("end", end);
 
-    // TODO: This is where we recalculate the transitions
+    // TODO: Loop through all transitions and update them
+    // TODO: if transition is set to false, skip it
+    // TODO: If the current time is greater than the end time, set the transition to false and set the current value to the after value
+    // TODO: If all transitions are set to false, set the "Global" transitioning flag to false
+    // TODO: Reset the feature state
 
-    // const updateTransitionState = () => {
-    //     let isStillTransitioning = false;
-
-    //     // Get current feature state transitions
-    //     const transitions = featureState.transitions;
-    //     if (!transitions) return;
-
-    //     // Update each transition value
-    //     transitions.forEach((transition, key) => {
-    //         const {start, end, scale} = transition;
-
-    //         // Calculate progress through transition (0-1)
-    //         const progress = Math.min((Date.now() - start) / (end - start), 1);
-            
-    //         // Get interpolated value
-    //         const current = scale(progress);
-            
-    //         // Update the transition's current value
-    //         transitions.set(key, {
-    //             ...transition,
-    //             current
-    //         });
-
-    //         // Check if this transition is still running
-    //         if (progress < 1) {
-    //             isStillTransitioning = true;
-    //         }
-    //     });
-
-    //     console.log("transitions", transitions);
-
-    //     // Update the feature state with new transition values
-    //     // XXX: This causing an infinite loop
-    //     map.setFeatureState(feature, {
-    //         ...featureState,
-    //         transitioning: isStillTransitioning
-    //     });
-
-        // Request next frame if still transitioning
-        // if (isStillTransitioning) {
-        //     requestAnimationFrame(updateTransitionState);
-        // }
 };
 
 
@@ -103,7 +67,6 @@ export const calculateFeatureTransitions: calculateFeatureTransitions = (
         }
     >();
 
-    let isTransitioning = false;
     layers?.forEach((layer) => {
         if (!layer.paint) return;
 
@@ -144,7 +107,6 @@ export const calculateFeatureTransitions: calculateFeatureTransitions = (
                                 .range([beforeValue, afterValue]),
                             transitioning: true,
                         });
-                        isTransitioning = true;
                     }
                 }
             }

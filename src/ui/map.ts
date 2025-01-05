@@ -2876,16 +2876,34 @@ export class Map extends Camera {
      * @see [Create a hover effect](https://maplibre.org/maplibre-gl-js/docs/examples/hover-styles/)
      */
     setFeatureState(feature: FeatureIdentifier, state: any): this {
-        // Trying to keep the new state logic separate for now
-        const featureState = calculateFeatureTransitions(this, feature, state);
-
-        // Apply the new state to the feature, merging the new state with the existing state
-        this.style.setFeatureState(feature, {...state, ...featureState});
-
-        // Kick off all transitions if there are any
-        if (featureState.transitioning) {
+        // Check if feature already has transitions in progress
+        const existingState = this.getFeatureState(feature);
+        if (existingState?.transitioning) {
             updateFeatureTransitions(this, feature);
+            return this;
         }
+
+        // Check if any paint properties have transitions but no transitions Map
+        const style = this.getStyle();
+        const hasTransitions = style?.layers.some(layer => 
+            layer.paint && Object.keys(layer.paint).some(key => 
+                key.endsWith('-transition')
+            )
+        );
+
+        if (hasTransitions && !state.transitions) {
+            // Calculate initial transition state
+            const featureState = calculateFeatureTransitions(this, feature, state);
+            this.style.setFeatureState(feature, {...state, ...featureState});
+            
+            if (featureState.transitioning) {
+                updateFeatureTransitions(this, feature);
+                return this;
+            }
+        }
+
+        // Apply regular state if there are no transitions
+        this.style.setFeatureState(feature, state);
 
         return this._update();
     }
