@@ -29,7 +29,7 @@ import {Terrain} from '../render/terrain';
 import {RenderToTexture} from '../render/render_to_texture';
 import {config} from '../util/config';
 import {defaultLocale} from './default_locale';
-import {calculateFeatureTransitions, updateFeatureTransitions} from '../util/transform_features';
+import {calculateFeatureTransitions, insertFeatureTransition, updateFeatureTransitions} from '../util/transform_features';
 
 import type {RequestTransformFunction} from '../util/request_manager';
 import type {LngLatLike} from '../geo/lng_lat';
@@ -2877,30 +2877,32 @@ export class Map extends Camera {
      */
     setFeatureState(feature: FeatureIdentifier, state: any): this {
         // Check if feature already has transitions in progress
-        const existingState = this.getFeatureState(feature);
-        if (existingState?.transitioning) {
-            updateFeatureTransitions(this, feature);
+        if (state?.transitioning) {
+            console.log("setFeatureState feature", feature);
+            // insertFeatureTransition(this, feature);
             return this;
         }
 
-        // Check if any paint properties have transitions but no transitions Map
-        const style = this.getStyle();
-        const hasTransitions = style?.layers.some(layer => 
-            layer.paint && Object.keys(layer.paint).some(key => 
-                key.endsWith('-transition')
-            )
-        );
+        console.log("setFeatureState state", state);
 
-        if (hasTransitions && !state.transitions) {
-            // Calculate initial transition state
-            const featureState = calculateFeatureTransitions(this, feature, state);
-            this.style.setFeatureState(feature, {...state, ...featureState});
+        // Check if any paint properties have transitions but no transitions Map
+        // const style = this.getStyle();
+        // const hasTransitions = style?.layers.some(layer => 
+        //     layer.paint && Object.keys(layer.paint).some(key => 
+        //         key.endsWith('-transition')
+        //     )
+        // );
+
+        // if (hasTransitions && !state.transitions) {
+        //     // Calculate initial transition state
+        //     const featureState = calculateFeatureTransitions(this, feature, state);
+        //     this.style.setFeatureState(feature, {...state, ...featureState});
             
-            if (featureState.transitioning) {
-                updateFeatureTransitions(this, feature);
-                return this;
-            }
-        }
+        //     if (featureState.transitioning) {
+        //         updateFeatureTransitions(this, feature);
+        //         return this;
+        //     }
+        // }
 
         // Apply regular state if there are no transitions
         this.style.setFeatureState(feature, state);

@@ -1,6 +1,32 @@
 import type { Map as MapLibreMap } from "../ui/map";
 import { scaleLinear } from "d3-scale";
 
+export const insertFeatureTransition = (
+    map: MapLibreMap,
+    feature: any,
+) => {
+    // Get the feature source
+    const source = feature.source;
+    const transitions = new Map<
+        string,
+        {
+            current: number;
+            scale: any;
+            transitioning: boolean;
+        }
+    >();
+        const now = Date.now();
+        transitions.set(source, {
+            current: 8,
+            scale: scaleLinear()
+                .domain([now, now + 1000])
+                .range([8, 16]),
+            transitioning: true
+        });
+    
+    map.setFeatureState(feature, { transitioning: true, transitions });
+};
+
 export const updateFeatureTransitions = (
     map: MapLibreMap,
     feature: any,
@@ -10,10 +36,12 @@ export const updateFeatureTransitions = (
     // If there's no feature state, nothing to transition
     if (!featureState) return;
 
+    console.log("updateFeatureTransitions featureState", featureState);
+
     // Get the start and end times for the transition
-    const [start, end] = featureState.transitions.get("unclustered-point-circle-radius-transition").scale.domain();
-    console.log("start", start);
-    console.log("end", end);
+    // const [start, end] = featureState.transitions.get("unclustered-point-circle-radius-transition").scale.domain();
+    // console.log("start", start);
+    // console.log("end", end);
 
     // TODO: Loop through all transitions and update them
     // TODO: if transition is set to false, skip it
