@@ -29,7 +29,7 @@ import {Terrain} from '../render/terrain';
 import {RenderToTexture} from '../render/render_to_texture';
 import {config} from '../util/config';
 import {defaultLocale} from './default_locale';
-import {calculateFeatureTransitions, insertFeatureTransition, updateFeatureTransitions} from '../util/transform_features';
+import {calculateFeatureTransitions, updateFeatureTransitions} from '../util/transform_features';
 
 import type {RequestTransformFunction} from '../util/request_manager';
 import type {LngLatLike} from '../geo/lng_lat';
@@ -2876,36 +2876,23 @@ export class Map extends Camera {
      * @see [Create a hover effect](https://maplibre.org/maplibre-gl-js/docs/examples/hover-styles/)
      */
     setFeatureState(feature: FeatureIdentifier, state: any): this {
-        // Check if feature already has transitions in progress
-        if (state?.transitioning) {
-            console.log("setFeatureState feature", feature);
-            // insertFeatureTransition(this, feature);
-            return this;
+        // Get existing feature state
+        const existingState = this.getFeatureState(feature);
+
+        // If feature is starting a transition, calculate the transitions and apply them to the feature state
+        if (state?.transition) {
+            const transitions = calculateFeatureTransitions(feature);
+            this.style.setFeatureState(feature, {...existingState, transitioning: true, transitions});
+            // Else if the transition is not starting but we need to update the transitions
+        } else if ( !state?.transition && existingState?.transitioning) {
+            const transitions = updateFeatureTransitions(feature);
+            this.style.setFeatureState(feature, {...existingState, transitions});
+        // If feature has no transitions in progress, apply the new state
+        } else {
+            this.style.setFeatureState(feature, state);
         }
 
-        console.log("setFeatureState state", state);
-
-        // Check if any paint properties have transitions but no transitions Map
-        // const style = this.getStyle();
-        // const hasTransitions = style?.layers.some(layer => 
-        //     layer.paint && Object.keys(layer.paint).some(key => 
-        //         key.endsWith('-transition')
-        //     )
-        // );
-
-        // if (hasTransitions && !state.transitions) {
-        //     // Calculate initial transition state
-        //     const featureState = calculateFeatureTransitions(this, feature, state);
-        //     this.style.setFeatureState(feature, {...state, ...featureState});
-            
-        //     if (featureState.transitioning) {
-        //         updateFeatureTransitions(this, feature);
-        //         return this;
-        //     }
-        // }
-
-        // Apply regular state if there are no transitions
-        this.style.setFeatureState(feature, state);
+        console.log('new feature state', this.getFeatureState(feature));
 
         return this._update();
     }
