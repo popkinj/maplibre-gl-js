@@ -1,4 +1,3 @@
-import type { Map as MapLibreMap } from "../ui/map";
 import { scaleLinear } from "d3-scale";
 
 export type FeatureTransitions = {
