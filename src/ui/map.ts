@@ -2884,21 +2884,14 @@ export class Map extends Camera {
             const transitions = calculateFeatureTransitions(feature);
             this.style.setFeatureState(feature, {...existingState, transitioning: true, transitions});
 
-            console.log('new feature state', this.getFeatureState(feature));
             // Else if the transition is not starting but we need to update the transitions
         } else if ( !state?.transition && existingState?.transitioning) {
             const transitions = updateFeatureTransitions(feature);
-            console.log('updated transitions', transitions);
-
             this.style.setFeatureState(feature, {...existingState, transitions});
 
-
-            console.log('updated feature state', this.getFeatureState(feature));
-        // If feature has no transitions in progress, apply the new state
+        // If feature has no transitions in progress, apply the new state as we got it.
         } else {
             this.style.setFeatureState(feature, state);
-
-            console.log('unchanged feature state', this.getFeatureState(feature));
         }
 
         return this._update();
