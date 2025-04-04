@@ -8,50 +8,46 @@ export type FeatureTransitions = {
 export const calculateFeatureTransitions = (
     feature: any,
 ) => {
-    // Get the feature source
     const source = feature.source;
-    const transitions = new Map<
-        string,
-        {
+    const transitions: {
+        [key: string]: {
             current: number;
             scale: any;
             transitioning: boolean;
         }
-    >();
-        const now = Date.now();
-
-        transitions.set(source, {
-            current: 8,
-            scale: scaleLinear()
-                .domain([now, now + 10000])
-                .range([8, 16]),
-            transitioning: true
-        });
+    } = {};
     
+    const now = Date.now();
+
+    transitions[source] = {
+        current: 8,
+        scale: scaleLinear()
+            .domain([now, now + 10000])
+            .range([8, 16]),
+        transitioning: true
+    };
+
     return transitions;
 };
 
 export const updateFeatureTransitions = (feature: any) => {
-    const transitions = feature.state.transitions; // The Map Set of transitions
+    const transitions = feature.state.transitions; // Now an object instead of Map
     const now = Date.now();
     
     if (transitions) {
-        // Loop through all transitions in the set
-        for (const [key, transition] of transitions.entries()) {
-            // Check if we're past the end of the transition
+        for (const key of Object.keys(transitions)) {
+            const transition = transitions[key];
             const endTime = transition.scale.domain()[1];
+            
             if (now >= endTime) {
-                // Remove the transition if it's complete
-                transitions.delete(key);
+                delete transitions[key];
             } else {
-                // Update the current value using the scale
                 transition.current = transition.scale(now);
-                console.log('transition.current', transition.current);
-                transitions.set(key, transition);
+                transitions[key] = transition;
             }
         }
     }
     
-    return transitions || new Map<string, any>();
+    return transitions || {};
 };
 
