@@ -2880,15 +2880,14 @@ export class Map extends Camera {
         const existingState = this.getFeatureState(feature);
 
         // If feature is starting a transition, calculate the transitions and apply them to the feature state
-        if (state?.transition) {
+        if (state?.pointsCircleRadiusTransition) {
             const transitions = calculateFeatureTransitions(feature);
-            this.style.setFeatureState(feature, {...existingState, transitioning: true, transitions});
+            this.style.setFeatureState(feature, {...existingState, ...transitions});
 
             // Else if the transition is not starting but we need to update the transitions
-        } else if ( !state?.transition && existingState?.transitioning) {
+        } else if ( !state?.pointsCircleRadiusTransition && existingState?.pointsCircleRadiusCurrent) {
             const transitions = updateFeatureTransitions(feature);
-            this.style.setFeatureState(feature, {...existingState, transitions});
-            // console.log('updated transitions', this.getFeatureState(feature));
+            this.style.setFeatureState(feature, {...existingState, ...transitions});
 
         // If feature has no transitions in progress, apply the new state as we got it.
         } else {

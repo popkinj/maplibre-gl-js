@@ -8,46 +8,33 @@ export type FeatureTransitions = {
 export const calculateFeatureTransitions = (
     feature: any,
 ) => {
-    const source = feature.source;
-    const transitions: {
-        [key: string]: {
-            current: number;
-            scale: any;
-            transitioning: boolean;
-        }
-    } = {};
     
     const now = Date.now();
 
-    transitions[source] = {
-        current: 8,
-        scale: scaleLinear()
+    return {
+        pointsCircleRadiusCurrent: 8,
+        pointsCircleRadiusTransition: false,
+        pointsCircleRadiusScale: scaleLinear()
             .domain([now, now + 10000])
             .range([8, 16]),
-        transitioning: true
-    };
-
-    return transitions;
+        pointsCircleRadiusTransitioning: true
+    }
 };
 
 export const updateFeatureTransitions = (feature: any) => {
-    const transitions = feature.state.transitions; // Now an object instead of Map
     const now = Date.now();
+
+    const state = feature.state;
+    const endTime = state.pointsCircleRadiusScale.domain()[1];
     
-    if (transitions) {
-        for (const key of Object.keys(transitions)) {
-            const transition = transitions[key];
-            const endTime = transition.scale.domain()[1];
-            
-            if (now >= endTime) {
-                delete transitions[key];
-            } else {
-                transition.current = transition.scale(now);
-                transitions[key] = transition;
-            }
-        }
+    if (now >= endTime) {
+        delete state.pointsCircleRadiusTransitioning;
+        delete state.pointsCircleRadiusScale;
+        delete state.pointsCircleRadiusCurrent;
+    } else {
+        state.pointsCircleRadiusCurrent = state.pointsCircleRadiusScale(now);
     }
-    
-    return transitions || {};
+
+    return state;
 };
 
