@@ -21,7 +21,7 @@ export const calculateFeatureTransitions = (
         const now = Date.now();
 
         transitions.set(source, {
-            current: 18,
+            current: 8,
             scale: scaleLinear()
                 .domain([now, now + 10000])
                 .range([8, 16]),
