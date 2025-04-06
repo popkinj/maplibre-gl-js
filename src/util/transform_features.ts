@@ -1,17 +1,10 @@
 import { scaleLinear } from "d3-scale";
 
-export const calculateFeatureTransitions = (
+export const calculateCircleRadiusTransition = (
     feature: any,
 ) => {
     const now = Date.now();
     
-    // Start animation for this feature if map is available
-    console.log('feature', feature);
-    // XXX: There is now feature.map
-    if (feature.map) {
-        animateFeature(feature);
-    }
-
     return {
         pointsCircleRadiusCurrent: 8,
         pointsCircleRadiusScale: scaleLinear()
@@ -20,7 +13,7 @@ export const calculateFeatureTransitions = (
     };
 };
 
-export const updateFeatureTransitions = (feature: any) => {
+export const updateCircleRadiusTransition = (feature: any) => {
     const now = Date.now();
     const state = feature.state;
     
@@ -63,5 +56,8 @@ function animateFeature(feature: any) {
         // Schedule next update
         requestAnimationFrame(() => animateFeature(feature));
     }
+}
+
+export const animateFeatureTick = (feature: any) => {
 }
 

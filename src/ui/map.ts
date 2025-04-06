@@ -29,7 +29,7 @@ import {Terrain} from '../render/terrain';
 import {RenderToTexture} from '../render/render_to_texture';
 import {config} from '../util/config';
 import {defaultLocale} from './default_locale';
-import {calculateFeatureTransitions, updateFeatureTransitions} from '../util/transform_features';
+import {calculateCircleRadiusTransition, updateCircleRadiusTransition} from '../util/transform_features';
 
 import type {RequestTransformFunction} from '../util/request_manager';
 import type {LngLatLike} from '../geo/lng_lat';
@@ -2881,13 +2881,13 @@ export class Map extends Camera {
 
         // If feature is starting a transition, calculate the transitions and apply them to the feature state
         if (state?.pointsCircleRadiusTransition) {
-            const transitions = calculateFeatureTransitions(feature);
-            this.style.setFeatureState(feature, {...existingState, ...transitions});
+            const transition = calculateCircleRadiusTransition(feature);
+            this.style.setFeatureState(feature, {...existingState, ...transition});
 
             // Else if the transition is not starting but we need to update the transitions
         } else if ( !state?.pointsCircleRadiusTransition && existingState?.pointsCircleRadiusCurrent) {
-            const transitions = updateFeatureTransitions(feature);
-            this.style.setFeatureState(feature, {...existingState, ...transitions});
+            const transition = updateCircleRadiusTransition(feature);
+            this.style.setFeatureState(feature, {...existingState, ...transition});
 
         // If feature has no transitions in progress, apply the new state as we got it.
         } else {
