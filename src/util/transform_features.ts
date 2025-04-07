@@ -1,10 +1,13 @@
 import { scaleLinear } from "d3-scale";
+import type {FeatureIdentifier} from '../style/style';
+import type {Map} from '../ui/map';
 
-export const calculateCircleRadiusTransition = (
+export const calculateTransition = (
     feature: any,
 ) => {
     const now = Date.now();
     
+    // These are specific to testing the transition
     return {
         pointsCircleRadiusCurrent: 8,
         pointsCircleRadiusScale: scaleLinear()
@@ -13,51 +16,38 @@ export const calculateCircleRadiusTransition = (
     };
 };
 
-export const updateCircleRadiusTransition = (feature: any) => {
+export const animateFeatureTick = (feature: FeatureIdentifier, map: Map) => {
     const now = Date.now();
-    const state = feature.state;
+    
+    // Get the current state from the map
+    const state = map.getFeatureState(feature);
     
     if (!state.pointsCircleRadiusScale) {
-        return state;
+        return;
     }
     
     const endTime = state.pointsCircleRadiusScale.domain()[1];
     
     if (now >= endTime) {
-        // Transition is complete - set final value
-        state.pointsCircleRadiusCurrent = state.pointsCircleRadiusScale.range()[1];
-        delete state.pointsCircleRadiusScale;
+        // Transition is complete - set final value and remove scale
+        map.setFeatureState(
+            feature,
+            { pointsCircleRadiusCurrent: state.pointsCircleRadiusScale.range()[1] }
+        );
+        // Remove the scale from the state
+        map.removeFeatureState(
+            feature,
+            'pointsCircleRadiusScale'
+        );
     } else {
         // Update current value
-        state.pointsCircleRadiusCurrent = state.pointsCircleRadiusScale(now);
-    }
-
-    return state;
-};
-
-// Single recursive function to handle animation
-function animateFeature(feature: any) {
-    const map = feature.map;
-    
-    // Get current state
-    const state = map.getFeatureState({
-        source: feature.source,
-        id: feature.id
-    });
-    
-    // Continue only if transition is still active
-    if (state && state.pointsCircleRadiusScale) {
-        // Update feature state to trigger a recalculation
         map.setFeatureState(
-            { source: feature.source, id: feature.id },
-            { updateTimestamp: Date.now() }
+            feature,
+            { pointsCircleRadiusCurrent: state.pointsCircleRadiusScale(now) }
         );
         
-        // Schedule next update
-        requestAnimationFrame(() => animateFeature(feature));
+        // Schedule the next tick
+        requestAnimationFrame(() => animateFeatureTick(feature, map));
     }
-}
-
-export const animateFeatureTick = (feature: any) => {
 }
 

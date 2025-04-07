@@ -29,7 +29,7 @@ import {Terrain} from '../render/terrain';
 import {RenderToTexture} from '../render/render_to_texture';
 import {config} from '../util/config';
 import {defaultLocale} from './default_locale';
-import {calculateCircleRadiusTransition, updateCircleRadiusTransition} from '../util/transform_features';
+import {calculateTransition, animateFeatureTick} from '../util/transform_features';
 
 import type {RequestTransformFunction} from '../util/request_manager';
 import type {LngLatLike} from '../geo/lng_lat';
@@ -2876,18 +2876,15 @@ export class Map extends Camera {
      * @see [Create a hover effect](https://maplibre.org/maplibre-gl-js/docs/examples/hover-styles/)
      */
     setFeatureState(feature: FeatureIdentifier, state: any): this {
-        // Get existing feature state
-        const existingState = this.getFeatureState(feature);
 
         // If feature is starting a transition, calculate the transitions and apply them to the feature state
-        if (state?.pointsCircleRadiusTransition) {
-            const transition = calculateCircleRadiusTransition(feature);
-            this.style.setFeatureState(feature, {...existingState, ...transition});
-
-            // Else if the transition is not starting but we need to update the transitions
-        } else if ( !state?.pointsCircleRadiusTransition && existingState?.pointsCircleRadiusCurrent) {
-            const transition = updateCircleRadiusTransition(feature);
-            this.style.setFeatureState(feature, {...existingState, ...transition});
+        if (state?.transition) {
+            const transitionScale = calculateTransition(feature);
+            delete state.transition; // Remove the transition flag from the state
+            this.style.setFeatureState(feature, {...state, ...transitionScale});
+            
+            // Start the animation by scheduling the next tick
+            animateFeatureTick(feature, this);
 
         // If feature has no transitions in progress, apply the new state as we got it.
         } else {
