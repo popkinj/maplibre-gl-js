@@ -2,6 +2,18 @@ import { scaleLinear } from "d3-scale";
 import type {FeatureIdentifier} from '../style/style';
 import type {Map} from '../ui/map';
 
+/**
+ * Calculates a transition for a feature's circle radius.
+ * 
+ * @param feature - The feature to calculate the transition for.
+ * @returns An object containing the current circle radius and a scale function for transitioning.
+ * The scale function is configured to transition from 8 to 16 pixels over a 10-second period.
+ * 
+ * @example
+ * ```ts
+ * const transition = calculateTransition(feature);
+ * ```
+ */
 export const calculateTransition = (
     feature: any,
 ) => {
@@ -16,6 +28,31 @@ export const calculateTransition = (
     };
 };
 
+/**
+ * Animates a feature's circle radius based on its current state.
+ * 
+ * @param feature - The feature identifier containing source, sourceLayer, and id properties.
+ * @param map - The Map instance to use for state management.
+ * 
+ * This function:
+ * 1. Gets the current state of the feature
+ * 2. If the transition has completed (current time >= end time):
+ *    - Sets the final circle radius value
+ *    - Removes the scale from the feature's state
+ * 3. If the transition is still ongoing:
+ *    - Updates the current circle radius value
+ *    - Schedules the next animation frame
+ * 
+ * @example
+ * ```ts
+ * // Start the animation for a feature
+ * animateFeatureTick({
+ *   source: 'my-source',
+ *   sourceLayer: 'my-layer',
+ *   id: 123
+ * }, map);
+ * ```
+ */
 export const animateFeatureTick = (feature: FeatureIdentifier, map: Map) => {
     const now = Date.now();
     
