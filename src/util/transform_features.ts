@@ -1,30 +1,49 @@
 import { scaleLinear } from "d3-scale";
+import { easeElasticOut, easeLinear } from "d3-ease";
 import type {FeatureIdentifier} from '../style/style';
 import type {Map} from '../ui/map';
 
 /**
  * Calculates a transition for a feature's circle radius.
  * 
- * @param feature - The feature to calculate the transition for.
+ * @param state - The state of the feature to calculate the transition for.
+ * @param map - The Map instance to use for state management.
  * @returns An object containing the current circle radius and a scale function for transitioning.
- * The scale function is configured to transition from 8 to 16 pixels over a 10-second period.
+ * The scale function is configured to transition from 8 to 16 pixels over a 1-second period.
  * 
  * @example
  * ```ts
- * const transition = calculateTransition(feature);
+ * const transition = calculateTransition(feature, map);
  * ```
  */
 export const calculateTransition = (
-    feature: any,
+    state: any,
+    map: Map
 ) => {
     const now = Date.now();
-    
-    // These are specific to testing the transition
+    const duration = 1000; // 1 second transition
+
+    // Get the easing function based on the transitionEase state
+    const easingFunction = state.transitionEase === 'elastic' ? easeElasticOut : easeLinear;
+
+    // Create the scale with the time domain
+    const scale = scaleLinear()
+        .domain([now, now + duration])
+        .range([8, 16]);
+
+    // Create a wrapped scale that applies the easing function
+    const wrappedScale = (t: number) => {
+        const progress = (t - now) / duration;
+        const easedProgress = easingFunction(Math.min(Math.max(progress, 0), 1));
+        return 8 + (easedProgress * 8); // Scale from 8 to 16 based on eased progress
+    };
+
+    // Copy all d3 scale methods to our wrapped scale
+    Object.assign(wrappedScale, scale);
+
     return {
-        pointsCircleRadiusCurrent: 8,
-        pointsCircleRadiusScale: scaleLinear()
-            .domain([now, now + 1000])
-            .range([8, 16])
+        pointsCircleRadius: 8,
+        pointsCircleRadiusScale: wrappedScale
     };
 };
 
@@ -69,7 +88,7 @@ export const animateFeatureTick = (feature: FeatureIdentifier, map: Map) => {
         // Transition is complete - set final value and remove scale
         map.setFeatureState(
             feature,
-            { pointsCircleRadiusCurrent: state.pointsCircleRadiusScale.range()[1] }
+            { pointsCircleRadius: state.pointsCircleRadiusScale.range()[1] }
         );
         // Remove the scale from the state
         map.removeFeatureState(
@@ -80,7 +99,7 @@ export const animateFeatureTick = (feature: FeatureIdentifier, map: Map) => {
         // Update current value
         map.setFeatureState(
             feature,
-            { pointsCircleRadiusCurrent: state.pointsCircleRadiusScale(now) }
+            { pointsCircleRadius: state.pointsCircleRadiusScale(now) }
         );
         
         // Schedule the next tick

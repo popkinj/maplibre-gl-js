@@ -2876,10 +2876,9 @@ export class Map extends Camera {
      * @see [Create a hover effect](https://maplibre.org/maplibre-gl-js/docs/examples/hover-styles/)
      */
     setFeatureState(feature: FeatureIdentifier, state: any): this {
-
         // If feature is starting a transition, calculate the transitions and apply them to the feature state
         if (state?.transition) {
-            const transitionScale = calculateTransition(feature);
+            const transitionScale = calculateTransition(state, this);
             delete state.transition; // Remove the transition flag from the state
             this.style.setFeatureState(feature, {...state, ...transitionScale});
             
