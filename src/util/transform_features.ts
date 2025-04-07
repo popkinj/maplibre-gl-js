@@ -23,7 +23,7 @@ export const calculateTransition = (
     return {
         pointsCircleRadiusCurrent: 8,
         pointsCircleRadiusScale: scaleLinear()
-            .domain([now, now + 10000])
+            .domain([now, now + 1000])
             .range([8, 16])
     };
 };
